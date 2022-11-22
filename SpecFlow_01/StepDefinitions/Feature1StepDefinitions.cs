@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using RestSharp;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace SpecFlow_01.StepDefinitions
@@ -20,17 +21,23 @@ namespace SpecFlow_01.StepDefinitions
         {
             try
             {
+                var time = "";
                 var endpoint = "https://reqres.in/api";
                 var client = new RestClient(endpoint);
                 var request = new RestRequest("users/1", Method.Get);
                 request.Timeout = 3000;
                 request.RequestFormat = DataFormat.Json;
                 request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 var response = await client.ExecuteGetAsync(request);
+                sw.Stop();
+                Console.WriteLine("Elapsed={0}", sw.Elapsed.TotalSeconds);
 
                 dynamic resp = Newtonsoft.Json.Linq.JObject.Parse(response.Content);
                 Id = resp.data.id;
-                
+
                 Console.WriteLine("log.response => " + response.Content);
             }
             catch (Exception e)
