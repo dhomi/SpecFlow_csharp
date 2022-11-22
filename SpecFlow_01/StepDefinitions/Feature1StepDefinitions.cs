@@ -21,7 +21,6 @@ namespace SpecFlow_01.StepDefinitions
         {
             try
             {
-                var time = "";
                 var endpoint = "https://reqres.in/api";
                 var client = new RestClient(endpoint);
                 var request = new RestRequest("users/1", Method.Get);
@@ -29,16 +28,16 @@ namespace SpecFlow_01.StepDefinitions
                 request.RequestFormat = DataFormat.Json;
                 request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
 
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+                System.Diagnostics.Stopwatch timer = new Stopwatch();
+                timer.Start();
                 var response = await client.ExecuteGetAsync(request);
-                sw.Stop();
-                Console.WriteLine("Elapsed={0}", sw.Elapsed.TotalSeconds);
+                timer.Stop();
 
                 dynamic resp = Newtonsoft.Json.Linq.JObject.Parse(response.Content);
                 Id = resp.data.id;
 
                 Console.WriteLine("log.response => " + response.Content);
+                Console.WriteLine("Elapsed={0}", timer.Elapsed.TotalSeconds);
             }
             catch (Exception e)
             {
