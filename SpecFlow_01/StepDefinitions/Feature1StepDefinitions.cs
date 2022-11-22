@@ -1,14 +1,14 @@
+using Newtonsoft.Json;
 using RestSharp;
-using SpecFlow.Internal.Json;
-using System.Net;
 using System.Text.Json;
-using System.Threading;
 
 namespace SpecFlow_01.StepDefinitions
 {
     [Binding]
     public class Feature1StepDefinitions
     {
+        public string? Id { get; private set; }
+
         [Given(@"reqres get test api")]
         public void GivenReqresGetTestApi()
         {
@@ -25,8 +25,12 @@ namespace SpecFlow_01.StepDefinitions
                 var request = new RestRequest("users/1", Method.Get);
                 request.Timeout = 3000;
                 request.RequestFormat = DataFormat.Json;
-                request.OnBeforeDeserialization = resp => { resp.ContentType= "application/json"; };
+                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
                 var response = await client.ExecuteGetAsync(request);
+
+                dynamic resp = Newtonsoft.Json.Linq.JObject.Parse(response.Content);
+                Id = resp.data.id;
+                
                 Console.WriteLine("log.response => " + response.Content);
             }
             catch (Exception e)
@@ -39,7 +43,8 @@ namespace SpecFlow_01.StepDefinitions
         public void ThenResponseStatusShouldBe(int p0)
         {
             //throw new PendingStepException();
-            Console.WriteLine("\rgiven");
+            Console.WriteLine("given\n");
+            Console.WriteLine("Id = " + Id);
         }
 
         private interface IRestResponse
